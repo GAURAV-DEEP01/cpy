@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     // Return the short URL
     return NextResponse.json({
       shortId,
-      url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://to.deeeep.fun"}/link/${shortId}`,
+      url: `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/${shortId}`,
     })
   } catch (error) {
     console.error("Error creating link:", error)

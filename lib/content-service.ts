@@ -40,21 +40,6 @@ export async function getContent(shortId: string): Promise<ContentItem | null> {
   return data[0] as ContentItem
 }
 
-export async function getCodeContent(shortId: string): Promise<ContentItem | null> {
-  const content = await getContent(shortId)
-  return content?.type === 'code' ? content : null
-}
-
-export async function getLinkContent(shortId: string): Promise<ContentItem | null> {
-  const content = await getContent(shortId)
-  return content?.type === 'link' ? content : null
-}
-
-export async function getImageContent(shortId: string): Promise<ContentItem | null> {
-  const content = await getContent(shortId)
-  return content?.type === 'img' ? content : null
-}
-
 export async function getRecentContent(limit = 10): Promise<ContentItem[]> {
   const { data, error } = await supabase
     .from('content')

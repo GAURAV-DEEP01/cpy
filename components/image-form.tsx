@@ -95,7 +95,7 @@ export function ImageForm() {
 
   const handleViewImage = () => {
     if (result?.shortId) {
-      router.push(`/img/${result.shortId}`)
+      router.push(`/${result.shortId}`)
     }
   }
 
@@ -126,12 +126,19 @@ export function ImageForm() {
           )}
 
           {result ? (
-            <Alert className="border-green-900/50 bg-green-900/20 text-green-400">
-              <Check className="h-4 w-4" />
-              <AlertDescription>
-                Your image has been shared! URL: <span className="font-mono bg-gray-900/50 rounded px-2 py-1">{result.url}</span>
-              </AlertDescription>
-            </Alert>
+            <>
+              <div className="flex justify-center items-center">
+                <div className="w-1/2 px-6 py-3 bg-gray-900 rounded-md shadow-xl hover:bg-gray-700 transition-all duration-300 scale-105">
+                  <span className="flex justify-center material-icons text-white text-2xl font-bold">{result.shortId}</span>
+                </div>
+              </div>
+              <Alert className="border-green-900/50 bg-green-900/20 text-green-400">
+                <Check className="h-4 w-4" />
+                <AlertDescription>
+                  Your image has been shared! URL: <span className="font-mono bg-gray-900/50 rounded px-2 py-1">{result.url}</span>
+                </AlertDescription>
+              </Alert>
+            </>
           ) : (
             <div className="space-y-4">
               <div className="flex flex-col items-center justify-center">

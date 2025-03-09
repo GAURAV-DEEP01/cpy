@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     await createContent({
       shortId,
       type: "img",
-      filePath: signedUrlData.signedUrl, // Store the signed URL with expiration
+      filePath: signedUrlData.signedUrl,
     })
 
     return NextResponse.json({

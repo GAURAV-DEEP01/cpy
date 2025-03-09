@@ -15,7 +15,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 export function CodeForm() {
   const router = useRouter()
   const [code, setCode] = useState("")
-  const [language, setLanguage] = useState("javascript")
+  const [language, setLanguage] = useState("plaintext")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<{ shortId: string; url: string } | null>(null)
@@ -62,7 +62,7 @@ export function CodeForm() {
 
   const handleViewCode = () => {
     if (result?.shortId) {
-      router.push(`/code/${result.shortId}`)
+      router.push(`/${result.shortId}`)
     }
   }
 
@@ -89,12 +89,19 @@ export function CodeForm() {
           )}
 
           {result ? (
-            <Alert className="border-green-900/50 bg-green-900/20 text-green-400">
-              <Check className="h-4 w-4" />
-              <AlertDescription>
-                Your code has been shared! URL: <span className="font-mono bg-gray-900/50 rounded px-2 py-1">{result.url}</span>
-              </AlertDescription>
-            </Alert>
+            <>
+              <div className="flex justify-center items-center">
+                <div className="w-1/2 px-6 py-3 bg-gray-900 rounded-md shadow-xl hover:bg-gray-700 transition-all duration-300 scale-105">
+                  <span className="flex justify-center material-icons text-white text-2xl font-bold">{result.shortId}</span>
+                </div>
+              </div>
+              <Alert className="border-green-900/50 bg-green-900/20 text-green-400">
+                <Check className="h-4 w-4" />
+                <AlertDescription>
+                  Your code has been shared! URL: <span className="font-mono bg-gray-900/50 rounded px-2 py-1">{result.url}</span>
+                </AlertDescription>
+              </Alert>
+            </>
           ) : (
             <>
               <div className="space-y-2">
@@ -102,7 +109,7 @@ export function CodeForm() {
                 <Textarea
                   id="code"
                   placeholder="Paste your code here..."
-                  className="min-h-[200px] font-mono border-gray-700 bg-gray-900/50 placeholder:text-gray-500 text-gray-200 focus:border-purple-500 focus:ring-purple-500/20"
+                  className="min-h-[200px] font-mono border-gray-800 bg-gray-900/50 placeholder:text-gray-500 text-gray-200 focus:border-purple-00 focus:ring-purple-500/20"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                 />
@@ -140,7 +147,7 @@ export function CodeForm() {
         <CardFooter className="flex justify-between border-t border-gray-700 pt-4">
           {result ? (
             <>
-              <Button type="button" variant="outline" className="border-gray-700 text-gray-300 hover:bg-gray-700 hover:text-white" onClick={handleCopyLink}>
+              <Button type="button" variant="outline" className="border-gray-700 bg-gray-700 text-gray-300 hover:bg-gray-700 hover:text-white" onClick={handleCopyLink}>
                 Copy Link
               </Button>
               <Button type="button" className="bg-purple-600 hover:bg-purple-700 text-white" onClick={handleViewCode}>
@@ -148,7 +155,7 @@ export function CodeForm() {
               </Button>
             </>
           ) : (
-            <Button type="submit" disabled={isSubmitting} className="ml-auto bg-purple-600 hover:bg-purple-700 text-white">
+            <Button type="submit" disabled={isSubmitting} className="ml-auto bg-purple-600/70 hover:bg-purple-700 text-white">
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Share Code
             </Button>

@@ -92,3 +92,11 @@ body {
     @apply bg-background text-foreground;
   }
 }
+.ripple {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,255,255,0.02), transparent);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}

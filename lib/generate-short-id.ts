@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 
-export async function generateShortId(length = 4): Promise<string> {
+export async function generateShortId(length = 3): Promise<string> {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
   let isUnique = false
   let shortId: string
