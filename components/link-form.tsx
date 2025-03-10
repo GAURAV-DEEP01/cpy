@@ -100,7 +100,7 @@ export function LinkForm() {
               <Alert className="border-green-900/50 bg-green-900/20 text-green-400">
                 <Check className="h-4 w-4" />
                 <AlertDescription>
-                  Your link has been shared! URL:{" "}
+                  Shareable link generated! URL:{" "}
                   <span className="font-mono bg-gray-900/50 rounded px-2 py-1 break-all">
                     {result.url}
                   </span>

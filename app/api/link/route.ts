@@ -2,18 +2,40 @@ import { type NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { createContent } from "@/lib/content-service"
 import { generateShortId } from "@/lib/generate-short-id"
+import { LRUCache } from "lru-cache"
 
 // Validation schema for link submission
 const linkSchema = z.object({
   url: z.string().url("Invalid URL format"),
 })
 
+const rateLimit = new LRUCache<string, { count: number; lastRequest: number }>({
+  max: 1000, // Max 1000 different IPs tracked
+  ttl: 60 * 1000, // 1 minute TTL
+})
+
+const RATE_LIMIT = 15 // Max 20 requests per minute
+
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown"
 
-    // Validate request body
+    // Check rate limit
+    const now = Date.now()
+    const requestData = rateLimit.get(ip) || { count: 0, lastRequest: now }
+
+    if (requestData.count >= RATE_LIMIT) {
+      return NextResponse.json({ error: "Too many requests, try again later" }, { status: 429 })
+    }
+
+    requestData.count += 1
+    requestData.lastRequest = now
+    rateLimit.set(ip, requestData)
+
+    // Parse and validate the request body
+    const body = await req.json()
     const result = linkSchema.safeParse(body)
+
     if (!result.success) {
       return NextResponse.json({ error: "Invalid request", details: result.error.format() }, { status: 400 })
     }
@@ -23,7 +45,6 @@ export async function POST(req: NextRequest) {
     // Generate a unique short ID
     const shortId = await generateShortId()
 
-    // Create the content in the database
     await createContent({
       shortId,
       type: "link",

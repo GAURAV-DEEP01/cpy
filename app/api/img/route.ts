@@ -1,11 +1,33 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createContent } from "@/lib/content-service"
 import { generateShortId } from "@/lib/generate-short-id"
+import { supabase } from "../../../lib/supabase"
+import { LRUCache } from "lru-cache"
 
-import { supabase } from '../../../lib/supabase'
+const rateLimit = new LRUCache<string, { count: number; lastRequest: number }>({
+  max: 500, // Max 500 different IPs tracked
+  ttl: 60 * 1000, // 1 minute TTL
+})
+
+const RATE_LIMIT = 5;
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown"
+
+    // Check rate limit
+    const now = Date.now()
+    const requestData = rateLimit.get(ip) || { count: 0, lastRequest: now }
+
+    if (requestData.count >= RATE_LIMIT) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+    }
+
+    requestData.count += 1
+    requestData.lastRequest = now
+    rateLimit.set(ip, requestData)
+
+    // Handle file upload
     const formData = await req.formData()
     const file = formData.get("file") as File | null
 
