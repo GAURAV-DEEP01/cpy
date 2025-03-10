@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 export const RedirectForm = () => {
   const [shortId, setShortId] = useState('')
   const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -18,6 +19,7 @@ export const RedirectForm = () => {
     }
 
     setError('')
+    setIsLoading(true)
     router.push(`/${trimmedShortId}`)
   }
 
@@ -35,9 +37,37 @@ export const RedirectForm = () => {
           />
           <button
             type="submit"
-            className="rounded-lg bg-gradient-to-r from-purple-300/70 to-cyan-500 px-6 py-4 text-lg font-medium text-black hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+            disabled={isLoading}
+            className={`rounded-lg bg-gradient-to-r from-purple-300/70 to-cyan-500 px-6 py-4 text-lg font-medium text-black hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 ${isLoading ? 'cursor-not-allowed opacity-50' : ''
+              }`}
           >
-            Redirect
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <svg
+                  className="animate-spin mr-2 h-5 w-5 text-black"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  ></path>
+                </svg>
+                Redirecting...
+              </div>
+            ) : (
+              'Redirect'
+            )}
           </button>
         </div>
         {error && <p className="text-center text-sm text-red-400">{error}</p>}
