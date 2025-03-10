@@ -1,3 +1,4 @@
+
 'use client'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CodeForm } from "@/components/code-form";
@@ -12,7 +13,6 @@ export default function Home() {
       <Background />
       {/* Gradient header background */}
       <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-violet-900/30 via-indigo-900/20 to-transparent" />
-
 
       {/* Content */}
       <div className="container relative mx-auto px-4 py-16">
@@ -34,7 +34,7 @@ export default function Home() {
           <RedirectForm />
         </div>
         {/* Tabs section */}
-        <div className="mx-auto mt-12 max-w-3xl rounded-xl bg-gray-800/50 p-6 backdrop-blur-sm">
+        <div className="mx-auto mt-12 w-full max-w-4xl rounded-xl bg-gray-800/50 p-4 sm:p-4 lg:p-4 backdrop-blur-sm">
           <Tabs defaultValue="code" className="w-full">
             <TabsList className="grid w-full grid-cols-3 rounded-lg bg-gray-800">
               <TabsTrigger
@@ -121,3 +121,4 @@ export default function Home() {
     </div>
   );
 }
+

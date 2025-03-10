@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       shortId,
-      url: `${process.env.NEXT_PUBLIC_BASE_URL}/img/${shortId}`,
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/${shortId}`,
       imageUrl: signedUrlData.signedUrl
     })
 

@@ -1,4 +1,3 @@
-// components/redirect-form.tsx
 'use client'
 
 import { useState } from 'react'
@@ -25,7 +24,7 @@ export const RedirectForm = () => {
   return (
     <div className="w-full max-w-2xl mx-auto mb-12">
       <form onSubmit={handleSubmit} className="space-y-2">
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <input
             type="text"
             value={shortId}
@@ -46,3 +45,4 @@ export const RedirectForm = () => {
     </div>
   )
 }
+
