@@ -4,7 +4,9 @@ import { createContent } from "@/lib/content-service"
 import { generateShortId } from "@/lib/generate-short-id"
 import { LRUCache } from "lru-cache"
 
-// Validation schema for code submission
+const MAX_CODE_SIZE = 50 * 1024 // 50 KB limit
+const RATE_LIMIT = 10 // 10 requests per minute
+
 const codeSchema = z.object({
   code: z.string().min(1, "Code is required"),
   language: z.string().optional(),
@@ -14,8 +16,6 @@ const rateLimit = new LRUCache<string, { count: number; lastRequest: number }>({
   max: 500, // Max 500 different IPs tracked
   ttl: 60 * 1000, // 1 minute TTL
 })
-
-const RATE_LIMIT = 10 // 10 requests per minute
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,6 +42,11 @@ export async function POST(req: NextRequest) {
     }
 
     const { code, language } = result.data
+
+    // Check code size limit
+    if (Buffer.byteLength(code, "utf-8") > MAX_CODE_SIZE) {
+      return NextResponse.json({ error: `Code size exceeds the maximum limit of ${MAX_CODE_SIZE / 1024} KB` }, { status: 413 })
+    }
 
     // Generate a unique short ID
     const shortId = await generateShortId()

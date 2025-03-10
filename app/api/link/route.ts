@@ -4,17 +4,18 @@ import { createContent } from "@/lib/content-service"
 import { generateShortId } from "@/lib/generate-short-id"
 import { LRUCache } from "lru-cache"
 
+const MAX_URL_LENGTH = 2048
+const RATE_LIMIT = 15 // Max 15 requests per minute
+
 // Validation schema for link submission
 const linkSchema = z.object({
-  url: z.string().url("Invalid URL format"),
+  url: z.string().url("Invalid URL format").max(MAX_URL_LENGTH, `URL exceeds the maximum length of ${MAX_URL_LENGTH} characters`),
 })
 
 const rateLimit = new LRUCache<string, { count: number; lastRequest: number }>({
   max: 1000, // Max 1000 different IPs tracked
   ttl: 60 * 1000, // 1 minute TTL
 })
-
-const RATE_LIMIT = 15 // Max 20 requests per minute
 
 export async function POST(req: NextRequest) {
   try {

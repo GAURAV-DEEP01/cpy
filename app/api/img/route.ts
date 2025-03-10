@@ -72,7 +72,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to generate signed URL" }, { status: 500 })
     }
 
-    // Create database record
     await createContent({
       shortId,
       type: "img",
