@@ -1,4 +1,3 @@
-
 'use client'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CodeForm } from "@/components/code-form";
@@ -33,6 +32,7 @@ export default function Home() {
         <div className="container relative mx-auto pt-12">
           <RedirectForm />
         </div>
+
         {/* Tabs section */}
         <div className="mx-auto mt-12 w-full max-w-4xl rounded-xl bg-gray-800/50 p-4 sm:p-4 lg:p-4 backdrop-blur-sm">
           <Tabs defaultValue="code" className="w-full">

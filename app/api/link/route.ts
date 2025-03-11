@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     const result = linkSchema.safeParse(body)
 
     if (!result.success) {
-      return NextResponse.json({ error: "Invalid request", details: result.error.format() }, { status: 400 })
+      return NextResponse.json({ error: result?.error?.errors?.[0]?.message || "Invalid request", details: result.error.format() }, { status: 400 })
     }
 
     const { url } = result.data

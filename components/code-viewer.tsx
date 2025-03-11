@@ -89,7 +89,6 @@ const CodeContent = memo(({
     </div>
   );
 }, (prevProps, nextProps) => {
-  // Custom comparison function to prevent unnecessary re-renders
   return (
     prevProps.code === nextProps.code &&
     prevProps.language === nextProps.language &&
@@ -99,7 +98,6 @@ const CodeContent = memo(({
   );
 });
 
-// Ensure displayName is set for memo component
 CodeContent.displayName = 'CodeContent';
 
 interface CodeViewerProps {
@@ -121,7 +119,6 @@ export function CodeViewer({
   const codeHeight = initialHeight;
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Use state for isMobile with an initial value based on window width
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window !== 'undefined') {
       return window.innerWidth < 640;
@@ -129,7 +126,6 @@ export function CodeViewer({
     return false;
   });
 
-  // Check if device is mobile
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
     checkMobile();
@@ -138,7 +134,6 @@ export function CodeViewer({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Handle ESC key to exit fullscreen and prevent body scroll
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && isFullscreen) {
@@ -155,7 +150,6 @@ export function CodeViewer({
     };
   }, [isFullscreen]);
 
-  // Handle copy to clipboard
   const handleCopy = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(code);
@@ -172,6 +166,7 @@ export function CodeViewer({
       textArea.focus();
       textArea.select();
       try {
+        // just for legecy dont worry 
         document.execCommand("copy");
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
@@ -182,7 +177,6 @@ export function CodeViewer({
     }
   }, [code]);
 
-  // Handle file download with appropriate extension
   const handleDownload = useCallback(() => {
     const element = document.createElement("a");
     const file = new Blob([code], { type: "text/plain" });

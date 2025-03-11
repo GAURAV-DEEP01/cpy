@@ -125,6 +125,8 @@ export function CodeForm() {
                     <SelectValue placeholder="Select language" />
                   </SelectTrigger>
                   <SelectContent className="border-gray-700 bg-gray-800 text-gray-300">
+                    <SelectItem value="plaintext">Plain Text</SelectItem>
+                    <SelectItem value="javascript">JavaScript</SelectItem>
                     <SelectItem value="javascript">JavaScript</SelectItem>
                     <SelectItem value="typescript">TypeScript</SelectItem>
                     <SelectItem value="python">Python</SelectItem>
@@ -140,7 +142,11 @@ export function CodeForm() {
                     <SelectItem value="html">HTML</SelectItem>
                     <SelectItem value="css">CSS</SelectItem>
                     <SelectItem value="sql">SQL</SelectItem>
-                    <SelectItem value="plaintext">Plain Text</SelectItem>
+                    <SelectItem value="sh">Bash</SelectItem>
+                    <SelectItem value="json">JSON</SelectItem>
+                    <SelectItem value="xml">XML</SelectItem>
+                    <SelectItem value="dockerfile">Dockerfile</SelectItem>
+                    <SelectItem value="md">Markdown</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
