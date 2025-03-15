@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo, memo } from "
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
+  Code2,
   Copy,
   Check,
   Download,
@@ -13,6 +14,7 @@ import {
 } from "lucide-react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import beautify from 'js-beautify';
 
 interface CodeContentProps {
   code: string;
@@ -118,6 +120,9 @@ export function CodeViewer({
   const [fontSize, setFontSize] = useState(14);
   const codeHeight = initialHeight;
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isFormatted, setIsFormatted] = useState(false);
+  const [formattedCode, setFormattedCode] = useState("");
+  const [isFormatting, setIsFormatting] = useState(false);
 
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -125,6 +130,69 @@ export function CodeViewer({
     }
     return false;
   });
+
+  // Check if formatting is supported for the current language
+  const isFormattingSupported = useMemo(() => {
+    const supportedLanguages = [
+      'javascript', 'typescript', 'jsx', 'tsx', 'json', 'css', 'html', 'xml'
+    ];
+    return supportedLanguages.includes(language.toLowerCase());
+  }, [language]);
+
+  // Format the code
+  const handleFormat = useCallback(() => {
+    if (!isFormattingSupported) return;
+
+    setIsFormatting(true);
+    try {
+      let formatted;
+      const options = {
+        indent_size: 2,
+        wrap_line_length: 80,
+        preserve_newlines: true,
+        max_preserve_newlines: 2,
+      };
+
+      // only these languages can be formatted
+      switch (language.toLowerCase()) {
+        case 'javascript':
+        case 'typescript':
+        case 'jsx':
+        case 'tsx':
+        case 'json':
+          formatted = beautify.js(code, options);
+          break;
+        case 'css':
+          formatted = beautify.css(code, options);
+          break;
+        case 'html':
+        case 'xml':
+          formatted = beautify.html(code, options);
+          break;
+        default:
+          formatted = code;
+          break;
+      }
+
+      setFormattedCode(formatted);
+      setIsFormatted(true);
+    } catch (error) {
+      console.error("Failed to format code:", error);
+      setIsFormatted(false);
+    } finally {
+      setIsFormatting(false);
+    }
+  }, [code, language, isFormattingSupported]);
+
+  const toggleFormattedView = useCallback(() => {
+    if (!isFormattingSupported) return;
+
+    if (!isFormatted && !formattedCode) {
+      handleFormat();
+    } else {
+      setIsFormatted(!isFormatted);
+    }
+  }, [isFormatted, formattedCode, handleFormat, isFormattingSupported]);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
@@ -150,15 +218,20 @@ export function CodeViewer({
     };
   }, [isFullscreen]);
 
+  useEffect(() => {
+    setIsFormatted(false);
+    setFormattedCode("");
+  }, [language, code]);
+
   const handleCopy = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(code);
+      await navigator.clipboard.writeText(isFormatted && formattedCode ? formattedCode : code);
       setCopied(true);
       setTimeout(() => setCopied(false), 1000);
     } catch (error) {
       console.error("Failed to copy:", error);
       const textArea = document.createElement("textarea");
-      textArea.value = code;
+      textArea.value = isFormatted && formattedCode ? formattedCode : code;
       textArea.style.position = "fixed";
       textArea.style.left = "-999999px";
       textArea.style.top = "-999999px";
@@ -166,7 +239,6 @@ export function CodeViewer({
       textArea.focus();
       textArea.select();
       try {
-        // just for legecy dont worry 
         document.execCommand("copy");
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
@@ -175,11 +247,11 @@ export function CodeViewer({
       }
       document.body.removeChild(textArea);
     }
-  }, [code]);
+  }, [code, formattedCode, isFormatted]);
 
   const handleDownload = useCallback(() => {
     const element = document.createElement("a");
-    const file = new Blob([code], { type: "text/plain" });
+    const file = new Blob([isFormatted && formattedCode ? formattedCode : code], { type: "text/plain" });
     element.href = URL.createObjectURL(file);
     const extensionMap: Record<string, string> = {
       javascript: "js",
@@ -213,7 +285,7 @@ export function CodeViewer({
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
-  }, [code, language, shortId]);
+  }, [code, formattedCode, isFormatted, language, shortId]);
 
   // Font size handlers
   const increaseFontSize = useCallback(() => {
@@ -227,10 +299,22 @@ export function CodeViewer({
   // Toggle fullscreen
   const toggleFullscreen = useCallback(() => {
     setIsFullscreen(prev => !prev);
+
   }, []);
 
   // Memoize line count calculation
   const lineCount = useMemo(() => code.split("\n").length, [code]);
+
+  // Format button content based on state
+  const formatButtonContent = useMemo(() => {
+    if (isFormatting) {
+      return <span className="text-gray-400">Formatting...</span>;
+    }
+    if (isFormatted) {
+      return <span className="text-green-400">✓ Formatted</span>;
+    }
+    return <span>Format</span>;
+  }, [isFormatting, isFormatted]);
 
   // Mobile toolbar - memoized
   const MobileToolbar = useMemo(() => (
@@ -242,6 +326,31 @@ export function CodeViewer({
         </span>
       </div>
       <div className="flex items-center space-x-1">
+        {isFormattingSupported && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleFormattedView}
+            disabled={!isFormattingSupported || isFormatting}
+            className={`${!isFormattingSupported ? 'text-gray-500 cursor-not-allowed' : 'text-gray-300 hover:text-white hover:bg-gray-700'} mr-2`}
+          >
+            {isFormatting ? (
+              <>
+                <span className="animate-spin mr-1">⟳</span>
+                <span className="ml-1">Formatting...</span>
+              </>
+            ) : (
+              <>
+                {isFormatted ? (
+                  <Check className="h-4 w-4 mr-1 text-green-400" />
+                ) : (
+                  <Code2 className="h-4 w-4 mr-1" />
+                )}
+                <span className="ml-1">{isFormatted ? "Formatted" : "Format"}</span>
+              </>
+            )}
+          </Button>
+        )}
         <Button
           variant="ghost"
           size="sm"
@@ -276,7 +385,7 @@ export function CodeViewer({
         </Button>
       </div>
     </div>
-  ), [language, handleCopy, handleDownload, toggleFullscreen, copied, isFullscreen]);
+  ), [language, handleCopy, handleDownload, toggleFullscreen, toggleFormattedView, copied, isFullscreen, isFormatted, isFormatting, isFormattingSupported]);
 
   // Desktop toolbar - memoized
   const DesktopToolbar = useMemo(() => (
@@ -291,65 +400,106 @@ export function CodeViewer({
         </span>
       </div>
       <div className="flex items-center space-x-2">
-        <div className="flex items-center mr-2">
+        <div className="flex items-center space-x-1">
+          {/* Format & Text Size Controls Group */}
+          <div className="flex items-center mr-3 border-r border-gray-700 pr-3">
+            {isFormattingSupported && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleFormattedView}
+                disabled={!isFormattingSupported || isFormatting}
+                className={`${!isFormattingSupported ? 'text-gray-500 cursor-not-allowed' : 'text-gray-300 hover:text-white hover:bg-gray-700'} mr-2`}
+              >
+                {isFormatting ? (
+                  <>
+                    <span className="animate-spin mr-1">⟳</span>
+                    <span className="ml-1">Formatting...</span>
+                  </>
+                ) : (
+                  <>
+                    {isFormatted ? (
+                      <Check className="h-4 w-4 mr-1 text-green-400" />
+                    ) : (
+                      <Code2 className="h-4 w-4 mr-1" />
+                    )}
+                    <span className="ml-1">{isFormatted ? "Formatted" : "Format"}</span>
+                  </>
+                )}
+              </Button>
+            )}
+
+            {/* Font Size Controls */}
+            <div className="flex items-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={decreaseFontSize}
+                className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-700"
+                title="Decrease font size"
+              >
+                <span className="text-lg font-bold">A-</span>
+              </Button>
+              <span className="mx-1 text-gray-400 text-xs">{fontSize}px</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={increaseFontSize}
+                className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-700"
+                title="Increase font size"
+              >
+                <span className="text-lg font-bold">A+</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Action Buttons Group */}
           <Button
             variant="ghost"
             size="sm"
-            onClick={decreaseFontSize}
-            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-700"
+            onClick={handleDownload}
+            className="text-gray-300 hover:text-white hover:bg-gray-700"
+            title="Download code"
           >
-            <span className="text-lg font-bold">A-</span>
+            <Download className="h-4 w-4" />
+            <span className="ml-2">Download</span>
           </Button>
-          <span className="mx-1 text-gray-400 text-xs">{fontSize}px</span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={increaseFontSize}
-            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-700"
-          >
-            <span className="text-lg font-bold">A+</span>
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopy}
+              className="text-gray-300 hover:text-white hover:bg-gray-700 bg-gray-600"
+              title="Copy code"
+            >
+              {copied ? (
+                <Check className="h-4 w-4 text-green-400" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
+              <span className="ml-2">{copied ? "Copied!" : "Copy"}</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleFullscreen}
+              className="text-gray-300 hover:text-white hover:bg-gray-700"
+              title="Toggle fullscreen"
+            >
+              {isFullscreen ? (
+                <Minimize className="h-4 w-4" />
+              ) : (
+                <Expand className="h-4 w-4" />
+              )}
+              <span className="ml-2">
+                {isFullscreen ? "Exit" : "Expand"}
+              </span>
+            </Button>
+          </div>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleCopy}
-          className="text-gray-300 hover:text-white hover:bg-gray-700"
-        >
-          {copied ? (
-            <Check className="h-4 w-4 text-green-400" />
-          ) : (
-            <Copy className="h-4 w-4" />
-          )}
-          <span className="ml-2">{copied ? "Copied!" : "Copy"}</span>
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleDownload}
-          className="text-gray-300 hover:text-white hover:bg-gray-700"
-        >
-          <Download className="h-4 w-4" />
-          <span className="ml-2">Download</span>
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleFullscreen}
-          className="text-gray-300 hover:text-white hover:bg-gray-700"
-        >
-          {isFullscreen ? (
-            <Minimize className="h-4 w-4" />
-          ) : (
-            <Expand className="h-4 w-4" />
-          )}
-          <span className="ml-2">
-            {isFullscreen ? "Exit" : "Expand"}
-          </span>
-        </Button>
       </div>
     </div>
-  ), [language, lineCount, fontSize, decreaseFontSize, increaseFontSize, handleCopy, handleDownload, toggleFullscreen, copied, isFullscreen]);
+  ), [language, lineCount, fontSize, decreaseFontSize, increaseFontSize, handleCopy, handleDownload, toggleFullscreen, copied, isFullscreen, isFormatted, isFormatting, formatButtonContent, isFormattingSupported]);
 
   // Fullscreen view
   if (isFullscreen) {
@@ -360,7 +510,7 @@ export function CodeViewer({
         </div>
         <div className="flex-1 overflow-auto">
           <CodeContent
-            code={code}
+            code={isFormatted && formattedCode ? formattedCode : code}
             language={language}
             fontSize={fontSize}
             codeHeight={codeHeight}
@@ -385,7 +535,7 @@ export function CodeViewer({
       {isMobile ? MobileToolbar : DesktopToolbar}
       <div className="overflow-hidden">
         <CodeContent
-          code={code}
+          code={isFormatted && formattedCode ? formattedCode : code}
           language={language}
           fontSize={fontSize}
           codeHeight={codeHeight}

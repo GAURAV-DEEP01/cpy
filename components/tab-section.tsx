@@ -1,6 +1,6 @@
 'use client'
 
-import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs";
+import { Tabs, TabsList } from "@/components/ui/tabs";
 
 export function TabSection({ defaultTab, children, tabButtons }: any) {
   return (
