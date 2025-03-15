@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { AlertCircle, Check, Loader2, Link as LinkIcon, Badge, BadgeInfo, BadgeAlert } from "lucide-react"
+import { AlertCircle, Check, Loader2, Link as LinkIcon } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export function LinkForm() {

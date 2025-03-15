@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,6 +16,7 @@ export function CodeForm() {
   const [code, setCode] = useState("")
   const [language, setLanguage] = useState("plaintext")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isRedirecting, setIsRedirecting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<{ shortId: string; url: string } | null>(null)
 
@@ -62,7 +62,10 @@ export function CodeForm() {
 
   const handleViewCode = () => {
     if (result?.shortId) {
-      router.push(`/${result.shortId}`)
+      setIsRedirecting(true) // Start loading state
+      setTimeout(() => {
+        router.push(`/${result.shortId}`)
+      }, 500) // Optional slight delay for smoother UX
     }
   }
 
@@ -158,8 +161,14 @@ export function CodeForm() {
               <Button type="button" variant="outline" className="border-gray-700 bg-gray-700 text-gray-300 hover:bg-gray-700 hover:text-white" onClick={handleCopyLink}>
                 Copy Link
               </Button>
-              <Button type="button" className="bg-purple-600 hover:bg-purple-700 text-white" onClick={handleViewCode}>
-                View Code
+              <Button
+                type="button"
+                className="bg-purple-600 hover:bg-purple-700 text-white flex items-center"
+                onClick={handleViewCode}
+                disabled={isRedirecting}
+              >
+                {isRedirecting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isRedirecting ? "Loading..." : "View Code"}
               </Button>
             </>
           ) : (

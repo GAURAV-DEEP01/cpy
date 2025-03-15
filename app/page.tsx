@@ -8,7 +8,7 @@ import { RedirectForm } from "@/components/redirect-form";
 
 export default function Home() {
   return (
-    <div className="min-h-screen text-gray-100 relative">
+    <div className="min-h-screen flex flex-col text-gray-100 relative">
       <Background />
       {/* Gradient header background */}
       <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-violet-900/30 via-indigo-900/20 to-transparent" />
@@ -113,9 +113,9 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <footer className="mt-20 border-t border-gray-800 py-8">
-        <div className="container mx-auto px-4 text-center text-sm text-gray-500">
-          <p className="text-white">© 2025 deeeep.fun All rights reserved.</p>
+      <footer className="mt-auto border-t border-gray-800 py-8 bg-gray-900 text-white">
+        <div className="container mx-auto px-4 text-center text-sm">
+          <p>© 2025 deeeep.fun All rights reserved.</p>
         </div>
       </footer>
     </div>
