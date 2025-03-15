@@ -9,7 +9,13 @@ import { Label } from "@/components/ui/label"
 import { AlertCircle, Check, Loader2, Link as LinkIcon } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
-export function LinkForm() {
+import { HandleLinkGenerated } from "@/app/page"
+
+interface LinkFormProp {
+  onLinkGenerated: HandleLinkGenerated;
+}
+
+export const LinkForm: React.FC<LinkFormProp> = ({ onLinkGenerated }: LinkFormProp) => {
   const [url, setUrl] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -47,8 +53,13 @@ export function LinkForm() {
         throw new Error(errorData.error || "Failed to create link")
       }
 
-      const data = await response.json()
+      const data: { shortId: string; url: string } = await response.json()
       setResult(data)
+
+      // Call the onLinkGenerated callback with the newly generated URL
+      if (data.shortId && onLinkGenerated) {
+        onLinkGenerated({ shortId: data.shortId, type: "link" });
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred")
     } finally {
@@ -66,6 +77,11 @@ export function LinkForm() {
     if (result?.url) {
       window.open(result.url, "_blank")
     }
+  }
+
+  const handleReset = () => {
+    setResult(null);
+    setUrl("");
   }
 
   return (
@@ -127,9 +143,19 @@ export function LinkForm() {
               <Button type="button" variant="outline" className="border-gray-700 bg-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white" onClick={handleCopyLink}>
                 Copy Link
               </Button>
-              <Button type="button" className="bg-cyan-600 hover:bg-cyan-700 text-white" onClick={handleTryLink}>
-                Try Link
-              </Button>
+              <div className="flex space-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700"
+                  onClick={handleReset}
+                >
+                  Create New
+                </Button>
+                <Button type="button" className="bg-cyan-600 hover:bg-cyan-700 text-white" onClick={handleTryLink}>
+                  Try Link
+                </Button>
+              </div>
             </>
           ) : (
             <Button type="submit" disabled={isSubmitting} className="ml-auto bg-cyan-600/70 hover:bg-cyan-700 text-white">
@@ -142,3 +168,4 @@ export function LinkForm() {
     </Card>
   )
 }
+

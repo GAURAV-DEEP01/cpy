@@ -33,7 +33,6 @@ export function ImageViewer({
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
 
-  // Check if device is mobile
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
     checkMobile();
@@ -41,7 +40,6 @@ export function ImageViewer({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Handle ESC key to exit fullscreen and prevent body scroll
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && isFullscreen) {
@@ -122,7 +120,6 @@ export function ImageViewer({
     setRotation(prev => (prev + 90) % 360);
   }, []);
 
-  // Mobile toolbar
   const MobileToolbar = (
     <div className="flex items-center justify-between bg-gray-800 px-3 py-2">
       <div className="flex items-center space-x-2">
@@ -169,7 +166,6 @@ export function ImageViewer({
     </div>
   );
 
-  // Desktop toolbar
   const DesktopToolbar = (
     <div className="flex items-center justify-between bg-gray-800 px-4 py-3">
       <div className="flex items-center space-x-3">
@@ -272,7 +268,6 @@ export function ImageViewer({
     </div>
   );
 
-  // Fullscreen view
   if (isFullscreen) {
     return (
       <div className="fixed inset-0 z-50 bg-gray-900/95 flex flex-col">
@@ -294,7 +289,6 @@ export function ImageViewer({
     );
   }
 
-  // Normal view
   return (
     <Card className="overflow-hidden border border-gray-700">
       {isMobile ? MobileToolbar : DesktopToolbar}

@@ -1,20 +1,26 @@
 "use client"
 
+import Image from "next/image"
 import type React from "react"
 import { useState, useRef } from "react"
-import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { AlertCircle, Check, ImageIcon, Loader2, Upload } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { AlertCircle, Check, ImageIcon, Loader2, Upload } from "lucide-react"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { HandleLinkGenerated } from "@/app/page"
 
-export function ImageForm() {
+interface ImageFormProps {
+  onLinkGenerated: HandleLinkGenerated;
+}
+
+export const ImageForm: React.FC<ImageFormProps> = ({ onLinkGenerated }: ImageFormProps) => {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isRedirecting, setIsRedirecting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<{ shortId: string; url: string } | null>(null)
 
@@ -78,8 +84,13 @@ export function ImageForm() {
         throw new Error(errorData.error || "Failed to upload image")
       }
 
-      const data = await response.json()
+      const data: { shortId: string; url: string } = await response.json()
       setResult(data)
+
+      // Call the onLinkGenerated callback with the generated URL
+      if (onLinkGenerated && data.url) {
+        onLinkGenerated({ shortId: data.shortId, type: "img" })
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred")
     } finally {
@@ -95,7 +106,10 @@ export function ImageForm() {
 
   const handleViewImage = () => {
     if (result?.shortId) {
-      router.push(`/${result.shortId}`)
+      setIsRedirecting(true)
+      setTimeout(() => {
+        router.push(`/${result.shortId}`)
+      }, 500)
     }
   }
 
@@ -187,17 +201,19 @@ export function ImageForm() {
               <Button
                 type="button"
                 variant="outline"
-                className="border-gray-700 text-gray-600 hover:bg-gray-700 hover:text-white"
+                className="border-gray-700 bg-gray-700 text-gray-300 hover:bg-gray-700 hover:text-white"
                 onClick={handleCopyLink}
               >
                 Copy Link
               </Button>
               <Button
                 type="button"
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center"
                 onClick={handleViewImage}
+                disabled={isRedirecting}
               >
-                View Image
+                {isRedirecting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isRedirecting ? "Loading..." : "View Image"}
               </Button>
             </>
           ) : (
@@ -215,3 +231,4 @@ export function ImageForm() {
     </Card>
   )
 }
+

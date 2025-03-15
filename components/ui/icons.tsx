@@ -1,10 +1,9 @@
 'use client'
 
 export const Icons = {
-  // Tab icons
   Code: (props: any) => (
     <svg
-      className={`mr-2 h-4 w-4 ${props.className || ''}`}
+      className={`h-4 w-4 ${props.className || ''}`}
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -16,7 +15,7 @@ export const Icons = {
 
   Link: (props: any) => (
     <svg
-      className={`mr-2 h-4 w-4 ${props.className || ''}`}
+      className={`h-4 w-4 ${props.className || ''}`}
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -29,7 +28,7 @@ export const Icons = {
 
   Image: (props: any) => (
     <svg
-      className={`mr-2 h-4 w-4 ${props.className || ''}`}
+      className={`h-4 w-4 ${props.className || ''}`}
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"

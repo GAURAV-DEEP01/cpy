@@ -1,21 +1,54 @@
 'use client'
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CodeForm } from "@/components/code-form";
-import { LinkForm } from "@/components/link-form";
-import { ImageForm } from "@/components/image-form";
-import Background from "../components/background"; // Adjust the import path as needed
+import { CodeForm } from '@/components/code/form'
+import { LinkForm } from "@/components/link/form";
+import { ImageForm } from "@/components/image/form";
+import { Background } from "@/components/ui/background";
 import { RedirectForm } from "@/components/redirect-form";
+import { RecentLinks } from "@/components/recent-links";
+import { FeatureCards } from "@/components/feature-cards";
+import { Footer } from "@/components/ui/footer";
+
+export interface RecentLinkData {
+  shortId: string;
+  type: string;
+  timestamp?: string;
+}
+
+export type RecentLinksArr = Array<RecentLinkData>;
+
+export type HandleLinkGenerated = ({ shortId, type }: RecentLinkData) => void;
 
 export default function Home() {
+  const [_generatedLink, setGeneratedLink] = useState("");
+  const [recentLinks, setRecentLinks]: [RecentLinksArr, any] = useState([]);
+
+  useEffect(() => {
+    const storedLinks = localStorage.getItem('recentLinks');
+    if (storedLinks) {
+      setRecentLinks(JSON.parse(storedLinks));
+    }
+  }, []);
+
+  const handleLinkGenerated: HandleLinkGenerated = ({ shortId, type }: { shortId: string, type: string }) => {
+    setGeneratedLink(shortId);
+
+    const updatedLinks: RecentLinksArr = [
+      { shortId, type, timestamp: new Date().toISOString() },
+      ...recentLinks.filter(link => link.shortId !== shortId)
+    ].slice(0, 4);
+
+    setRecentLinks(updatedLinks);
+    localStorage.setItem('recentLinks', JSON.stringify(updatedLinks));
+  };
+
   return (
     <div className="min-h-screen flex flex-col text-gray-100 relative">
       <Background />
-      {/* Gradient header background */}
       <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-violet-900/30 via-indigo-900/20 to-transparent" />
 
-      {/* Content */}
       <div className="container relative mx-auto px-4 py-16">
-        {/* Header section */}
         <div className="flex flex-col items-center justify-center space-y-6 text-center">
           <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">
             cpy.
@@ -33,7 +66,6 @@ export default function Home() {
           <RedirectForm />
         </div>
 
-        {/* Tabs section */}
         <div className="mx-auto mt-12 w-full max-w-4xl rounded-xl bg-gray-800/50 p-4 sm:p-4 lg:p-4 backdrop-blur-sm">
           <Tabs defaultValue="code" className="w-full">
             <TabsList className="grid w-full grid-cols-3 rounded-lg bg-gray-800">
@@ -67,58 +99,22 @@ export default function Home() {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="code" className="mt-6">
-              <CodeForm />
+              <CodeForm onLinkGenerated={handleLinkGenerated} />
             </TabsContent>
             <TabsContent value="link" className="mt-6">
-              <LinkForm />
+              <LinkForm onLinkGenerated={handleLinkGenerated} />
             </TabsContent>
             <TabsContent value="image" className="mt-6">
-              <ImageForm />
+              <ImageForm onLinkGenerated={handleLinkGenerated} />
             </TabsContent>
           </Tabs>
         </div>
 
-        {/* Feature highlights in grid */}
-        <div className="mt-24 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-lg bg-gray-800/90 p-6 transition-all hover:bg-gray-800">
-            <div className="mb-4 rounded-full bg-violet-900/30 p-3 w-12 h-12 flex items-center justify-center">
-              <svg className="h-6 w-6 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-medium">Lightning Fast</h3>
-            <p className="mt-2 text-gray-400">Generate and share content in seconds with our optimized platform.</p>
-          </div>
+        <RecentLinks recent={recentLinks} />
 
-          <div className="rounded-lg bg-gray-800/80 p-6 transition-all hover:bg-gray-800">
-            <div className="mb-4 rounded-full bg-cyan-900/30 p-3 w-12 h-12 flex items-center justify-center">
-              <svg className="h-6 w-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-medium">Content available up to 24 hrs</h3>
-            <p className="mt-2 text-gray-400">Your content is available for 24 hours and will be discarded.</p>
-          </div>
-
-          <div className="rounded-lg bg-gray-800/80 p-6 transition-all hover:bg-gray-800 sm:col-span-2 lg:col-span-1">
-            <div className="mb-4 rounded-full bg-emerald-900/30 p-3 w-12 h-12 flex items-center justify-center">
-              <svg className="h-6 w-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-medium">Multiple Formats</h3>
-            <p className="mt-2 text-gray-400">Share code, links, and images - all with the same simple interface.</p>
-          </div>
-        </div>
+        <FeatureCards />
       </div>
-
-      {/* Footer */}
-      <footer className="mt-auto border-t border-gray-800 py-8 bg-gray-900 text-white">
-        <div className="container mx-auto px-4 text-center text-sm">
-          <p>© 2025 deeeep.fun All rights reserved.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
-

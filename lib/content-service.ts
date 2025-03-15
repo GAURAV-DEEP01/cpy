@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { LRUCache } from 'lru-cache'
 
 export interface ContentItem {
   shortId: string
@@ -9,6 +10,11 @@ export interface ContentItem {
   createdAt: string
   views: number
 }
+
+const contentCache = new LRUCache<string, ContentItem>({
+  max: 500,
+  ttl: 1000 * 60 * 5,
+})
 
 export async function createContent(data: {
   shortId: string
@@ -27,25 +33,32 @@ export async function createContent(data: {
     throw new Error(`Failed to create content: ${error.message}`)
   }
 
+  // Invalidate the cache for this shortId if it exists, so that future reads fetch the latest data.
+  contentCache.delete(data.shortId)
+
   return content as ContentItem
 }
 
 export async function getContent(shortId: string): Promise<ContentItem | null> {
+  // Attempt to retrieve from cache first
+  const cachedContent = contentCache.get(shortId)
+  if (cachedContent) {
+    return cachedContent
+  }
+
+  // Make the DB call if not cached
   const { data, error } = await supabase.rpc('increment_views', { short_id: shortId })
 
   if (error || !data?.length) {
     return null
   }
 
-  return data[0] as ContentItem
+  const contentItem = data[0] as ContentItem
+
+  // Cache the result for subsequent calls
+  contentCache.set(shortId, contentItem)
+
+  return contentItem
 }
 
-export async function getRecentContent(limit = 10): Promise<ContentItem[]> {
-  const { data, error } = await supabase
-    .from('content')
-    .select('*')
-    .order('createdAt', { ascending: false })
-    .limit(limit)
 
-  return (data || []) as ContentItem[]
-}

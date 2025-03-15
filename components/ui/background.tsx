@@ -24,7 +24,7 @@ interface CodeSnippet {
   scale: number;
 }
 
-const CodeBackground: React.FC = () => {
+export const Background: React.FC = () => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   const codeSnippetsLibrary = useMemo(() => [
@@ -157,4 +157,3 @@ const CodeBackground: React.FC = () => {
   );
 };
 
-export default CodeBackground;

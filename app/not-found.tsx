@@ -1,6 +1,6 @@
 'use client';
 import Link from "next/link";
-import Background from "@/components/background";
+import { Background } from "@/components/ui/background";
 
 export default function NotFound() {
   return (

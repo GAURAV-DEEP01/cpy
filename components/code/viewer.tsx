@@ -12,9 +12,9 @@ import {
   Minimize,
   X,
 } from "lucide-react";
+import beautify from 'js-beautify';
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
-import beautify from 'js-beautify';
 
 interface CodeContentProps {
   code: string;

@@ -3,15 +3,20 @@
 import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
-import { AlertCircle, Check, Loader2, Code as CodeIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { HandleLinkGenerated } from "@/app/page"
+import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { AlertCircle, Check, Loader2, Code as CodeIcon } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
-export function CodeForm() {
+interface CodeFormProps {
+  onLinkGenerated: HandleLinkGenerated;
+}
+
+export const CodeForm: React.FC<CodeFormProps> = ({ onLinkGenerated }: CodeFormProps) => {
   const router = useRouter()
   const [code, setCode] = useState("")
   const [language, setLanguage] = useState("plaintext")
@@ -45,8 +50,12 @@ export function CodeForm() {
         throw new Error(errorData.error || "Failed to create code snippet")
       }
 
-      const data = await response.json()
+      const data: { shortId: string, url: string } = await response.json()
       setResult(data)
+
+      if (data.shortId && onLinkGenerated) {
+        onLinkGenerated({ shortId: data.shortId, type: "code" });
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred")
     } finally {
@@ -63,10 +72,18 @@ export function CodeForm() {
   const handleViewCode = () => {
     if (result?.shortId) {
       setIsRedirecting(true) // Start loading state
+      // Save the URL to recent links before redirecting
+
       setTimeout(() => {
         router.push(`/${result.shortId}`)
       }, 500) // Optional slight delay for smoother UX
     }
+  }
+
+  const handleReset = () => {
+    setResult(null);
+    setCode("");
+    setLanguage("plaintext");
   }
 
   return (
@@ -161,15 +178,25 @@ export function CodeForm() {
               <Button type="button" variant="outline" className="border-gray-700 bg-gray-700 text-gray-300 hover:bg-gray-700 hover:text-white" onClick={handleCopyLink}>
                 Copy Link
               </Button>
-              <Button
-                type="button"
-                className="bg-purple-600 hover:bg-purple-700 text-white flex items-center"
-                onClick={handleViewCode}
-                disabled={isRedirecting}
-              >
-                {isRedirecting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isRedirecting ? "Loading..." : "View Code"}
-              </Button>
+              <div className="flex space-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700"
+                  onClick={handleReset}
+                >
+                  Create New
+                </Button>
+                <Button
+                  type="button"
+                  className="bg-purple-600 hover:bg-purple-700 text-white flex items-center"
+                  onClick={handleViewCode}
+                  disabled={isRedirecting}
+                >
+                  {isRedirecting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isRedirecting ? "Loading..." : "View Code"}
+                </Button>
+              </div>
             </>
           ) : (
             <Button type="submit" disabled={isSubmitting} className="ml-auto bg-purple-600/70 hover:bg-purple-700 text-white">
@@ -182,3 +209,4 @@ export function CodeForm() {
     </Card>
   )
 }
+
