@@ -11,11 +11,9 @@ interface RecentLinksProps {
 
 const formatTime = (timestamp: string): string => {
   const timeDiff = Math.floor((Date.now() - new Date(timestamp).getTime()) / 1000);
-
   if (timeDiff < 60) {
     return "just now";
   }
-
   return new Date(timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 };
 

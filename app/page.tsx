@@ -34,9 +34,16 @@ export default function Home() {
   const handleLinkGenerated: HandleLinkGenerated = ({ shortId, type }: { shortId: string, type: string }) => {
     setGeneratedLink(shortId);
 
+    const now = new Date().getTime();
+    const twentyFourHours = 24 * 60 * 60 * 1000;
+
+    const validLinks = recentLinks.filter(link => {
+      return (now - new Date(link.timestamp as string).getTime()) < twentyFourHours;
+    });
+
     const updatedLinks: RecentLinksArr = [
       { shortId, type, timestamp: new Date().toISOString() },
-      ...recentLinks.filter(link => link.shortId !== shortId)
+      ...validLinks.filter(link => link.shortId !== shortId)
     ].slice(0, 4);
 
     setRecentLinks(updatedLinks);

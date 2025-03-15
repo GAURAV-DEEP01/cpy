@@ -14,7 +14,7 @@ interface ContentPageProp {
 }
 
 export default async function cpyPiece({ params }: ContentPageProp) {
-  let { shortId }: { shortId: string } = await params;
+  let { shortId }: { shortId: string } = /* @ts-ignore */ await params;
   shortId = shortId.toLowerCase();
 
   if (shortId.length !== 3) {

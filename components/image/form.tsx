@@ -30,7 +30,6 @@ export const ImageForm: React.FC<ImageFormProps> = ({ onLinkGenerated }: ImageFo
     setError(null)
 
     if (selectedFile) {
-      // Validate file type
       const validImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"]
       if (!validImageTypes.includes(selectedFile.type)) {
         setError("Invalid file type. Only JPEG, PNG, GIF, and WebP are supported.")
@@ -39,7 +38,6 @@ export const ImageForm: React.FC<ImageFormProps> = ({ onLinkGenerated }: ImageFo
         return
       }
 
-      // Validate file size (max 5MB)
       const maxSize = 5 * 1024 * 1024 // 5MB
       if (selectedFile.size > maxSize) {
         setError("File too large. Maximum size is 5MB.")
@@ -48,7 +46,6 @@ export const ImageForm: React.FC<ImageFormProps> = ({ onLinkGenerated }: ImageFo
         return
       }
 
-      // Create preview
       const reader = new FileReader()
       reader.onloadend = () => {
         setPreview(reader.result as string)
@@ -87,7 +84,6 @@ export const ImageForm: React.FC<ImageFormProps> = ({ onLinkGenerated }: ImageFo
       const data: { shortId: string; url: string } = await response.json()
       setResult(data)
 
-      // Call the onLinkGenerated callback with the generated URL
       if (onLinkGenerated && data.url) {
         onLinkGenerated({ shortId: data.shortId, type: "img" })
       }

@@ -124,14 +124,24 @@ export function CodeViewer({
   const [formattedCode, setFormattedCode] = useState("");
   const [isFormatting, setIsFormatting] = useState(false);
 
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth < 640;
-    }
-    return false;
-  });
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Check if formatting is supported for the current language
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 800);
+    };
+
+    checkScreenSize();
+
+    window.addEventListener('resize', checkScreenSize);
+    window.addEventListener('orientationchange', checkScreenSize);
+
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+      window.removeEventListener('orientationchange', checkScreenSize);
+    };
+  }, []);
+
   const isFormattingSupported = useMemo(() => {
     const supportedLanguages = [
       'javascript', 'typescript', 'jsx', 'tsx', 'json', 'css', 'html', 'xml'
@@ -139,7 +149,6 @@ export function CodeViewer({
     return supportedLanguages.includes(language.toLowerCase());
   }, [language]);
 
-  // Format the code
   const handleFormat = useCallback(() => {
     if (!isFormattingSupported) return;
 
@@ -287,7 +296,6 @@ export function CodeViewer({
     document.body.removeChild(element);
   }, [code, formattedCode, isFormatted, language, shortId]);
 
-  // Font size handlers
   const increaseFontSize = useCallback(() => {
     setFontSize(prev => Math.min(prev + 2, 24));
   }, []);
@@ -296,16 +304,13 @@ export function CodeViewer({
     setFontSize(prev => Math.max(prev - 2, 10));
   }, []);
 
-  // Toggle fullscreen
   const toggleFullscreen = useCallback(() => {
     setIsFullscreen(prev => !prev);
 
   }, []);
 
-  // Memoize line count calculation
   const lineCount = useMemo(() => code.split("\n").length, [code]);
 
-  // Format button content based on state
   const formatButtonContent = useMemo(() => {
     if (isFormatting) {
       return <span className="text-gray-400">Formatting...</span>;
@@ -316,7 +321,6 @@ export function CodeViewer({
     return <span>Format</span>;
   }, [isFormatting, isFormatted]);
 
-  // Mobile toolbar - memoized
   const MobileToolbar = useMemo(() => (
     <div className="flex items-center justify-between bg-gray-800 px-3 py-2">
       <div className="flex items-center space-x-2">
@@ -387,7 +391,6 @@ export function CodeViewer({
     </div>
   ), [language, handleCopy, handleDownload, toggleFullscreen, toggleFormattedView, copied, isFullscreen, isFormatted, isFormatting, isFormattingSupported]);
 
-  // Desktop toolbar - memoized
   const DesktopToolbar = useMemo(() => (
     <div className="flex items-center justify-between bg-gray-800 px-4 py-3">
       <div className="flex items-center space-x-3">
@@ -501,7 +504,6 @@ export function CodeViewer({
     </div>
   ), [language, lineCount, fontSize, decreaseFontSize, increaseFontSize, handleCopy, handleDownload, toggleFullscreen, copied, isFullscreen, isFormatted, isFormatting, formatButtonContent, isFormattingSupported]);
 
-  // Fullscreen view
   if (isFullscreen) {
     return (
       <div className="fixed inset-0 z-50 bg-gray-900/95 flex flex-col">

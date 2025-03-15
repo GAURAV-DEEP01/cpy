@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Download,
-  Share2,
+  Copy,
   Maximize,
   Minimize,
   X,
@@ -135,7 +135,7 @@ export function ImageViewer({
           {isShared ? (
             <Check className="h-3.5 w-3.5 text-green-400" />
           ) : (
-            <Share2 className="h-3.5 w-3.5" />
+            <Copy className="h-3.5 w-3.5" />
           )}
         </Button>
         <Button
@@ -210,7 +210,7 @@ export function ImageViewer({
           {isShared ? (
             <Check className="h-4 w-4 text-green-400" />
           ) : (
-            <Share2 className="h-4 w-4" />
+            <Copy className="h-4 w-4" />
           )}
           <span className="ml-2">{isShared ? "Copied!" : "Copy Link"}</span>
         </Button>
