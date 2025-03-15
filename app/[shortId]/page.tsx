@@ -4,14 +4,16 @@ import { CodeViewer } from "@/components/code/viewer";
 import { ImageViewer } from "@/components/image/viewer";
 import { Background } from "@/components/ui/background";
 import { Footer } from "@/components/ui/footer";
+import { isValidURL } from "@/lib/utils";
+import QrCodeButton from "@/components/qr-code";
 
-interface CodePageProps {
+interface ContentPageProp {
   params: {
     shortId: string;
   };
 }
 
-export default async function cpyPiece({ params }: CodePageProps) {
+export default async function cpyPiece({ params }: ContentPageProp) {
   let { shortId }: { shortId: string } = await params;
   shortId = shortId.toLowerCase();
 
@@ -58,10 +60,15 @@ export default async function cpyPiece({ params }: CodePageProps) {
         <div className="mx-auto max-w-4xl">
           {sharePiece.type === "code" ? (
             <>
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-bold">
-                  <span className="text-gray-400">Code Snippet: </span>
-                  <span className="ml-2 bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">{shortId}</span>
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold ">
+                  <div className="flex justify-between">
+                    <div >
+                      <span className="text-gray-400">Code Snippet: </span>
+                      <span className="ml-2 bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">{shortId}</span>
+                    </div>
+                    <QrCodeButton shortId={shortId} />
+                  </div>
                 </h2>
               </div>
               <CodeViewer
@@ -72,10 +79,15 @@ export default async function cpyPiece({ params }: CodePageProps) {
             </>
           ) : (
             <>
-              <div className="mb-6 flex items-center justify-between">
+              <div className="mb-6">
                 <h2 className="text-2xl font-bold">
-                  <span className="text-gray-400">Image: </span>
-                  <span className="ml-2 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">{shortId}</span>
+                  <div className="flex justify-between">
+                    <div >
+                      <span className="text-gray-400">Image: </span>
+                      <span className="ml-2 bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">{shortId}</span>
+                      <QrCodeButton shortId={shortId} />
+                    </div >
+                  </div>
                 </h2>
               </div>
               <ImageViewer
@@ -92,11 +104,4 @@ export default async function cpyPiece({ params }: CodePageProps) {
   );
 }
 
-function isValidURL(url: string) {
-  try {
-    new URL(url);
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
+

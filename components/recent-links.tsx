@@ -3,6 +3,7 @@
 import React from "react";
 import { Icons } from "@/components/ui/icons";
 import { RecentLinksArr } from "@/app/page";
+import QrCodeButton from "./qr-code";
 
 interface RecentLinksProps {
   recent: RecentLinksArr;
@@ -35,28 +36,32 @@ export const RecentLinks: React.FC<RecentLinksProps> = ({ recent }) => {
             const IconComponent =
               iconMapping[item.type as keyof typeof iconMapping] || Icons.Link;
             return (
-              <a
-                key={item.shortId}
-                href={`/${item.shortId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center p-4 rounded-lg bg-gray-700/70 hover:bg-gray-600 transition-all duration-300 group border border-gray-600/30 hover:border-indigo-500/30 hover:shadow-md hover:shadow-indigo-900/10"
-              >
-                <div className="rounded-lg bg-indigo-900/50 w-12 h-12 flex items-center justify-center flex-shrink-0 mr-4 group-hover:bg-indigo-800/50 transition-colors">
-                  <IconComponent className="text-indigo-400 group-hover:text-indigo-300" />
-                </div>
-                <div className="flex-1 min-w-0 text-center">
-                  <p className="truncate text-indigo-300 font-mono font-extrabold text-xl md:text-2xl block w-full">
-                    {item.shortId}
-                  </p>
-                  <p className="text-xs text-gray-400">{formatTime(item.timestamp as string)}</p>
-                </div>
-                <div className="ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="bg-indigo-900/70 px-3 py-1 rounded-full text-xs font-medium text-indigo-200 hover:bg-indigo-800">
-                    Visit
-                  </span>
-                </div>
-              </a>
+              <div key={item.shortId} className="flex items-center justify-between  p-4 rounded-lg bg-gray-700/70 hover:bg-gray-600 transition-all duration-300 group border border-gray-600/30 hover:border-indigo-500/30 hover:shadow-md hover:shadow-indigo-900/10">
+                <a
+                  href={`/${item.shortId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center w-full "
+                >
+                  <div className="rounded-lg bg-indigo-900/50 w-12 h-12 flex items-center justify-center flex-shrink-0 mr-4 group-hover:bg-indigo-800/50 transition-colors">
+                    <IconComponent className="text-indigo-400 group-hover:text-indigo-300" />
+                  </div>
+                  <div className="flex-1 min-w-0 text-center">
+                    <p className="truncate text-indigo-300 font-mono font-extrabold text-xl md:text-2xl block w-full">
+                      {item.shortId}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {formatTime(item.timestamp as string)}
+                    </p>
+                  </div>
+                  <div className="ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="bg-indigo-900/70 px-3 py-1 rounded-full text-xs font-medium text-indigo-200 hover:bg-indigo-800">
+                      Visit
+                    </span>
+                  </div>
+                </a>
+                <QrCodeButton shortId={item.shortId} />
+              </div>
             );
           })}
         </div>
