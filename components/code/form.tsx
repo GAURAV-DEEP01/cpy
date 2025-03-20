@@ -63,20 +63,16 @@ export const CodeForm: React.FC<CodeFormProps> = ({ onLinkGenerated }: CodeFormP
     }
   }
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     if (result?.url) {
-      navigator.clipboard.writeText(result.url)
+      await navigator.clipboard.writeText(result.url)
     }
   }
 
   const handleViewCode = () => {
     if (result?.shortId) {
-      setIsRedirecting(true) // Start loading state
-      // Save the URL to recent links before redirecting
-
-      setTimeout(() => {
-        router.push(`/${result.shortId}`)
-      }, 500) // Optional slight delay for smoother UX
+      setIsRedirecting(true)
+      router.push(`/${result.shortId}`)
     }
   }
 
@@ -95,7 +91,10 @@ export const CodeForm: React.FC<CodeFormProps> = ({ onLinkGenerated }: CodeFormP
           </div>
           <div>
             <CardTitle className="text-gray-100">Share Code Snippet</CardTitle>
-            <CardDescription className="text-gray-400">Paste your code below and get a shareable link</CardDescription>
+            <CardDescription className="text-gray-400">
+              <span className="inline sm:hidden">Paste your code</span>
+              <span className="hidden sm:inline">Paste your code below and get a shareable link</span>
+            </CardDescription>
           </div>
         </div>
       </CardHeader>
@@ -119,9 +118,11 @@ export const CodeForm: React.FC<CodeFormProps> = ({ onLinkGenerated }: CodeFormP
                 <Check className="h-4 w-4" />
                 <AlertDescription>
                   Shareable link generated! URL:
-                  <span className="font-mono bg-gray-900/50 rounded px-2 py-1 break-all">
-                    {result.url}
-                  </span>
+                  <div className="sm:inline-block">
+                    <span className="sm:ml-4 font-mono bg-gray-900/50 rounded px-2 py-1 break-all">
+                      {result.url}
+                    </span>
+                  </div>
                 </AlertDescription>
               </Alert>
             </>
@@ -185,7 +186,10 @@ export const CodeForm: React.FC<CodeFormProps> = ({ onLinkGenerated }: CodeFormP
                   className="border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700"
                   onClick={handleReset}
                 >
-                  Create New
+                  <CardDescription className="text-gray-400">
+                    <span className="inline sm:hidden">New</span>
+                    <span className="hidden sm:inline">Create New</span>
+                  </CardDescription>
                 </Button>
                 <Button
                   type="button"
@@ -194,7 +198,11 @@ export const CodeForm: React.FC<CodeFormProps> = ({ onLinkGenerated }: CodeFormP
                   disabled={isRedirecting}
                 >
                   {isRedirecting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {isRedirecting ? "Loading..." : "View Code"}
+                  {isRedirecting ? <span> Loading...</span> :
+                    <div>
+                      <span className="inline sm:hidden">View</span>
+                      <span className="hidden sm:inline">View Code</span>
+                    </div>}
                 </Button>
               </div>
             </>

@@ -75,7 +75,7 @@ export function ImageViewer({
       window.URL.revokeObjectURL(url);
 
       setIsDownloaded(true);
-      setTimeout(() => setIsDownloaded(false), 2000);
+      setTimeout(() => setIsDownloaded(false), 1000);
     } catch (error) {
       console.error("Error downloading the image:", error);
     }

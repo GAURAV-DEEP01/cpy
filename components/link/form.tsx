@@ -93,7 +93,10 @@ export const LinkForm: React.FC<LinkFormProp> = ({ onLinkGenerated }: LinkFormPr
           </div>
           <div>
             <CardTitle className="text-gray-100">Share Link</CardTitle>
-            <CardDescription className="text-gray-400">Enter a URL to get a short, shareable link</CardDescription>
+            <CardDescription className="text-gray-400">
+              <span className="inline sm:hidden">Enter a URL</span>
+              <span className="hidden sm:inline">Enter a URL to get a short, shareable link</span>
+            </CardDescription>
           </div>
         </div>
       </CardHeader>

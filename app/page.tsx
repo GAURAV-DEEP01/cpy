@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Footer } from "@/components/ui/footer";
 import { CodeForm } from '@/components/code/form'
 import { LinkForm } from "@/components/link/form";
 import { ImageForm } from "@/components/image/form";
@@ -8,7 +9,6 @@ import { Background } from "@/components/ui/background";
 import { RedirectForm } from "@/components/redirect-form";
 import { RecentLinks } from "@/components/recent-links";
 import { FeatureCards } from "@/components/feature-cards";
-import { Footer } from "@/components/ui/footer";
 
 export interface RecentLinkData {
   shortId: string;
@@ -17,7 +17,6 @@ export interface RecentLinkData {
 }
 
 export type RecentLinksArr = Array<RecentLinkData>;
-
 export type HandleLinkGenerated = ({ shortId, type }: RecentLinkData) => void;
 
 export default function Home() {
@@ -73,7 +72,7 @@ export default function Home() {
           <RedirectForm />
         </div>
 
-        <div className="mx-auto mt-12 w-full max-w-4xl rounded-xl bg-gray-800/50 p-4 sm:p-4 lg:p-4 backdrop-blur-sm">
+        <div className="mx-auto mt-12 w-full max-w-4xl rounded-xl bg-gray-800/50 p-1 sm:p-4 backdrop-blur-sm">
           <Tabs defaultValue="code" className="w-full">
             <TabsList className="grid w-full grid-cols-3 rounded-lg bg-gray-800">
               <TabsTrigger
@@ -120,8 +119,8 @@ export default function Home() {
         <RecentLinks recent={recentLinks} />
 
         <FeatureCards />
+        <Footer />
       </div>
-      <Footer />
     </div>
   );
 }

@@ -67,27 +67,6 @@ const CodeContent = memo(({
       >
         {code}
       </SyntaxHighlighter>
-      <style jsx>{`
-        .custom-scrollbar {
-          overflow: auto;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #000;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background-color: #000;
-          border-radius: 10px;
-          border: 2px solid #000;
-        }
-        /* For Firefox */
-        .custom-scrollbar {
-          scrollbar-width: thin;
-          scrollbar-color: #000 #000;
-        }
-      `}</style>
     </div>
   );
 }, (prevProps, nextProps) => {
@@ -250,7 +229,7 @@ export function CodeViewer({
       try {
         document.execCommand("copy");
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        setTimeout(() => setCopied(false), 1000);
       } catch (err) {
         console.error("Fallback copy method failed:", err);
       }
@@ -346,11 +325,17 @@ export function CodeViewer({
             ) : (
               <>
                 {isFormatted ? (
-                  <Check className="h-4 w-4 mr-1 text-green-400" />
+                  <Check className="h-4 w-4 sm:mr-1 text-green-400" />
                 ) : (
-                  <Code2 className="h-4 w-4 mr-1" />
+                  <Code2 className="h-4 w-4 sm:mr-1" />
                 )}
-                <span className="ml-1">{isFormatted ? "Formatted" : "Format"}</span>
+                <span className="ml-1">
+                  {isFormatted ? (
+                    <span className="hidden sm:inline">Formatted</span>
+                  ) : (
+                    <span className="hidden sm:inline">Format</span>
+                  )}
+                </span>
               </>
             )}
           </Button>

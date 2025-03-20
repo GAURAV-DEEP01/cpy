@@ -122,7 +122,10 @@ export const ImageForm: React.FC<ImageFormProps> = ({ onLinkGenerated }: ImageFo
           </div>
           <div>
             <CardTitle className="text-gray-100">Share Image</CardTitle>
-            <CardDescription className="text-gray-400">Upload an image to get a shareable link</CardDescription>
+            <CardDescription className="text-gray-400">
+              <span className="inline sm:hidden">Upload an image</span>
+              <span className="hidden sm:inline">Upload an image to get a shareable link</span>
+            </CardDescription>
           </div>
         </div>
       </CardHeader>
