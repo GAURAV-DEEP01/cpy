@@ -84,9 +84,9 @@ export const CodeForm: React.FC<CodeFormProps> = ({ onLinkGenerated }: CodeFormP
 
   return (
     <Card className="border-gray-700 bg-gray-800/70 backdrop-blur">
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          <div className="rounded-md bg-purple-900/50 p-2">
+      <CardHeader className="sm:pb-0">
+        <div className="flex items-center gap-4">
+          <div className="rounded-md bg-purple-900/50 p-3">
             <CodeIcon className="h-5 w-5 text-purple-400" />
           </div>
           <div>
