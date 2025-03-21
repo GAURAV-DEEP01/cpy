@@ -156,8 +156,6 @@ export const CodeForm: React.FC<CodeFormProps> = ({ onLinkGenerated }: CodeFormP
                     <SelectItem value="go">Go</SelectItem>
                     <SelectItem value="rust">Rust</SelectItem>
                     <SelectItem value="php">PHP</SelectItem>
-                    <SelectItem value="ruby">Ruby</SelectItem>
-                    <SelectItem value="swift">Swift</SelectItem>
                     <SelectItem value="kotlin">Kotlin</SelectItem>
                     <SelectItem value="html">HTML</SelectItem>
                     <SelectItem value="css">CSS</SelectItem>
@@ -165,7 +163,7 @@ export const CodeForm: React.FC<CodeFormProps> = ({ onLinkGenerated }: CodeFormP
                     <SelectItem value="sh">Bash</SelectItem>
                     <SelectItem value="json">JSON</SelectItem>
                     <SelectItem value="xml">XML</SelectItem>
-                    <SelectItem value="dockerfile">Dockerfile</SelectItem>
+                    <SelectItem value="yaml">YAML</SelectItem>
                     <SelectItem value="md">Markdown</SelectItem>
                   </SelectContent>
                 </Select>
@@ -207,7 +205,11 @@ export const CodeForm: React.FC<CodeFormProps> = ({ onLinkGenerated }: CodeFormP
               </div>
             </>
           ) : (
-            <Button type="submit" disabled={isSubmitting} className="ml-auto bg-purple-600/70 hover:bg-purple-700 text-white">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="ml-auto bg-gradient-to-r from-purple-500/70 to-purple-600/50 hover:from-purple-600 hover:to-purple-800 text-white shadow-md hover:shadow-lg transition-all duration-200"
+            >
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Share Code
             </Button>
@@ -217,4 +219,3 @@ export const CodeForm: React.FC<CodeFormProps> = ({ onLinkGenerated }: CodeFormP
     </Card>
   )
 }
-

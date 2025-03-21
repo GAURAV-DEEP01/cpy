@@ -26,7 +26,16 @@ export default function Home() {
   useEffect(() => {
     const storedLinks = localStorage.getItem('recentLinks');
     if (storedLinks) {
-      setRecentLinks(JSON.parse(storedLinks));
+      const now = new Date().getTime();
+      const oneDay = 24 * 60 * 60 * 1000;
+
+      const filteredLinks = JSON.parse(storedLinks).filter((link: any) => {
+        const linkTime = new Date(link.timestamp).getTime();
+        return now - linkTime < oneDay;
+      });
+
+      setRecentLinks(filteredLinks);
+      localStorage.setItem('recentLinks', JSON.stringify(filteredLinks));
     }
   }, []);
 

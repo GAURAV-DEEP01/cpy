@@ -1,3 +1,4 @@
+'use server'
 import { notFound, redirect } from "next/navigation";
 import { getContent } from "@/lib/content-service";
 import { CodeViewer } from "@/components/code/viewer";
@@ -49,11 +50,13 @@ export default async function cpyPiece({ params }: ContentPageProp) {
       <div className="container relative mx-auto px-4 py-5">
         <div className="flex flex-col items-center justify-center space-y-2 text-center mb-5">
           <h1 className="text-3xl font-bold tracking-tight">
-            cpy.
-            <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
-              deeeep
-            </span>
-            .fun
+            <a href="/">
+              cpy.
+              <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+                deeeep
+              </span>
+              .fun
+            </a>
           </h1>
         </div>
 
@@ -103,5 +106,3 @@ export default async function cpyPiece({ params }: ContentPageProp) {
     </div>
   );
 }
-
-

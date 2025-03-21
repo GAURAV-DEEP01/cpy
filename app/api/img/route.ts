@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createContent } from "@/lib/content-service"
 import { generateShortId } from "@/lib/generate-short-id"
-import { supabase } from "../../../lib/supabase"
+import { supabase } from "@/lib/supabase"
 import { LRUCache } from "lru-cache"
 
 const rateLimit = new LRUCache<string, { count: number; lastRequest: number }>({
-  max: 500, // Max 500 different IPs tracked
+  max: 500,
   ttl: 60 * 1000, // 1 minute TTL
 })
 
@@ -15,7 +15,6 @@ export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown"
 
-    // Check rate limit
     const now = Date.now()
     const requestData = rateLimit.get(ip) || { count: 0, lastRequest: now }
 
@@ -27,7 +26,6 @@ export async function POST(req: NextRequest) {
     requestData.lastRequest = now
     rateLimit.set(ip, requestData)
 
-    // Handle file upload
     const formData = await req.formData()
     const file = formData.get("file") as File | null
 
@@ -43,7 +41,6 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Validate file size (max 5MB)
     const maxSize = 5 * 1024 * 1024
     if (file.size > maxSize) {
       return NextResponse.json({ error: "File too large. Maximum size is 5MB." }, { status: 400 })
