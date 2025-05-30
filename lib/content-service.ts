@@ -40,13 +40,11 @@ export async function createContent(data: {
 }
 
 export async function getContent(shortId: string): Promise<ContentItem | null> {
-  // Attempt to retrieve from cache first
   const cachedContent = contentCache.get(shortId)
+
   if (cachedContent) {
     return cachedContent
   }
-
-  // Make the DB call if not cached
   const { data, error } = await supabase.rpc('increment_views', { short_id: shortId })
 
   if (error || !data?.length) {

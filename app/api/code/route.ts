@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     // Return the short URL
     return NextResponse.json({
       shortId,
-      url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://to.deeeep.fun"}/${shortId}`,
+      url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://cpy.deeeep.fun"}/${shortId}`,
     })
   } catch (error) {
     console.error("Error creating code snippet:", error)

@@ -1,19 +1,30 @@
-'use client';
+"use client";
 
 import { useState, useRef, useMemo, memo, useCallback } from "react";
 import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Copy, QrCode, Check, Download } from "lucide-react";
 
 interface QrCodeButtonProps {
   shortId: string;
 }
 
+const sanitizeShortId = (shortId: string): string => {
+  return shortId.replace(/[^a-zA-Z0-9-_]/g, "");
+};
+
 export default function QrCodeButton({ shortId }: QrCodeButtonProps) {
   const [isCopied, setIsCopied] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const qrRef = useRef<HTMLDivElement>(null);
+
+  shortId = useMemo(() => sanitizeShortId(shortId), [shortId]);
 
   const url = useMemo(() => {
     const baseUrl =
@@ -38,7 +49,9 @@ export default function QrCodeButton({ shortId }: QrCodeButtonProps) {
     const img = new Image();
     const serializer = new XMLSerializer();
     const svgData = serializer.serializeToString(svg);
-    const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    const svgBlob = new Blob([svgData], {
+      type: "image/svg+xml;charset=utf-8",
+    });
     const blobUrl = URL.createObjectURL(svgBlob);
 
     img.onload = () => {
@@ -60,56 +73,56 @@ export default function QrCodeButton({ shortId }: QrCodeButtonProps) {
     <Dialog onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
-          variant="ghost"
-          size="icon"
-          className="ml-2 bg hover:bg-gray-800"
-          aria-label="Open QR Code dialog"
+          variant='ghost'
+          size='icon'
+          className='ml-2 bg hover:bg-gray-800'
+          aria-label='Open QR Code dialog'
         >
-          <QrCode className="w-5 h-5 text-gray-300 hover:text-white" />
+          <QrCode className='w-5 h-5 text-gray-300 hover:text-white' />
         </Button>
       </DialogTrigger>
       <DialogContent
-        className="w-full max-w-[90vw] sm:max-w-md mx-auto flex flex-col items-center gap-4 p-6 bg-gray-900 border border-gray-700 shadow-xl rounded-lg"
-        aria-modal="true"
+        className='w-full max-w-[90vw] sm:max-w-md mx-auto flex flex-col items-center gap-4 p-6 bg-gray-900 border border-gray-700 shadow-xl rounded-lg'
+        aria-modal='true'
       >
-        <DialogTitle className="text-white">Scan QR Code</DialogTitle>
+        <DialogTitle className='text-white'>Scan QR Code</DialogTitle>
         {isOpen && (
           <div
             ref={qrRef}
-            className="bg-white p-2 rounded-lg shadow-lg"
-            role="img"
+            className='bg-white p-2 rounded-lg shadow-lg'
+            role='img'
             aria-label={`QR Code linking to ${url}`}
           >
             <MemoizedQRCode value={url} />
           </div>
         )}
-        <div className="flex flex-col w-full gap-2">
-          <div className="px-6 mt-5 mb-2 flex items-center gap-2 p-2 bg-gray-950 rounded-lg justify-between">
-            <span className="text-sm text-gray-300 break-all">{url}</span>
+        <div className='flex flex-col w-full gap-2'>
+          <div className='px-6 mt-5 mb-2 flex items-center gap-2 p-2 bg-gray-950 rounded-lg justify-between'>
+            <span className='text-sm text-gray-300 break-all'>{url}</span>
             <Button
-              variant="ghost"
-              size="sm"
+              variant='ghost'
+              size='sm'
               onClick={copyToClipboard}
-              className="hover:bg-gray-700 flex items-center justify-center w-8 h-8"
-              aria-label="Copy URL to clipboard"
+              className='hover:bg-gray-700 flex items-center justify-center w-8 h-8'
+              aria-label='Copy URL to clipboard'
             >
               {isCopied ? (
-                <Check className="w-4 h-4 text-green-400" />
+                <Check className='w-4 h-4 text-green-400' />
               ) : (
-                <Copy className="w-4 h-4 text-gray-300 hover:text-white" />
+                <Copy className='w-4 h-4 text-gray-300 hover:text-white' />
               )}
             </Button>
           </div>
           <Button
             onClick={downloadQrCode}
-            variant="secondary"
-            className="w-full flex items-center gap-2"
-            aria-label="Download QR Code"
+            variant='secondary'
+            className='w-full flex items-center gap-2'
+            aria-label='Download QR Code'
           >
-            <Download className="w-4 h-4" /> Download QR Code
+            <Download className='w-4 h-4' /> Download QR Code
           </Button>
         </div>
-        <span className="sr-only" role="status">
+        <span className='sr-only' role='status'>
           {isCopied ? "URL copied to clipboard" : ""}
         </span>
       </DialogContent>
