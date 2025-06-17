@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { HandleLinkGenerated } from "@/app/page"
 import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Check, Loader2, Code as CodeIcon } from "lucide-react"
+import { AlertCircle, Check, Loader2, Code as CodeIcon, Copy } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -22,6 +22,7 @@ export const CodeForm: React.FC<CodeFormProps> = ({ onLinkGenerated }: CodeFormP
   const [language, setLanguage] = useState("plaintext")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isRedirecting, setIsRedirecting] = useState(false)
+  const [isCopied, setIsCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<{ shortId: string; url: string } | null>(null)
 
@@ -65,7 +66,14 @@ export const CodeForm: React.FC<CodeFormProps> = ({ onLinkGenerated }: CodeFormP
 
   const handleCopyLink = async () => {
     if (result?.url) {
-      await navigator.clipboard.writeText(result.url)
+      try {
+        await navigator.clipboard.writeText(result.url)
+        setIsCopied(true)
+        // Reset the copied state after 2 seconds
+        setTimeout(() => setIsCopied(false), 2000)
+      } catch (err) {
+        console.error('Failed to copy link:', err)
+      }
     }
   }
 
@@ -80,6 +88,7 @@ export const CodeForm: React.FC<CodeFormProps> = ({ onLinkGenerated }: CodeFormP
     setResult(null);
     setCode("");
     setLanguage("plaintext");
+    setIsCopied(false);
   }
 
   return (
@@ -174,8 +183,26 @@ export const CodeForm: React.FC<CodeFormProps> = ({ onLinkGenerated }: CodeFormP
         <CardFooter className="flex justify-between border-t border-gray-700 pt-4">
           {result ? (
             <>
-              <Button type="button" variant="outline" className="border-gray-700 bg-gray-700 text-gray-300 hover:bg-gray-700 hover:text-white" onClick={handleCopyLink}>
-                Copy Link
+              <Button
+                type="button"
+                variant="outline"
+                className={`border-gray-700 text-gray-300 hover:text-white transition-all duration-200 ${isCopied
+                  ? 'bg-green-700 border-green-600 text-green-100 hover:bg-green-600'
+                  : 'bg-gray-700 hover:bg-gray-600'
+                  }`}
+                onClick={handleCopyLink}
+              >
+                {isCopied ? (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copy Link
+                  </>
+                )}
               </Button>
               <div className="flex space-x-2">
                 <Button

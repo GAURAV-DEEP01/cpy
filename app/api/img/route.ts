@@ -6,7 +6,7 @@ import { LRUCache } from "lru-cache"
 
 const rateLimit = new LRUCache<string, { count: number; lastRequest: number }>({
   max: 500,
-  ttl: 60 * 1000, // 1 minute TTL
+  ttl: 60 * 1000,
 })
 
 const RATE_LIMIT = 5;
@@ -14,29 +14,23 @@ const RATE_LIMIT = 5;
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown"
-
     const now = Date.now()
     const requestData = rateLimit.get(ip) || { count: 0, lastRequest: now }
-
     if (requestData.count >= RATE_LIMIT) {
       return NextResponse.json({ error: "Too many requests" }, { status: 429 })
     }
-
     requestData.count += 1
     requestData.lastRequest = now
     rateLimit.set(ip, requestData)
-
     const formData = await req.formData()
     const file = formData.get("file") as File | null
-
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 })
     }
 
-    const validImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"]
-    if (!validImageTypes.includes(file.type)) {
+    if (!file.type.startsWith('image/')) {
       return NextResponse.json(
-        { error: "Invalid file type. Only JPEG, PNG, GIF, and WebP are supported." },
+        { error: "Invalid file type. Only image files are supported." },
         { status: 400 },
       )
     }
@@ -47,7 +41,8 @@ export async function POST(req: NextRequest) {
     }
 
     const shortId = await generateShortId()
-    const fileExt = file.name.split(".").pop() || "jpg"
+
+    const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg"
     const fileName = `${shortId}.${fileExt}`
 
     const { data: _uploadData, error: uploadError } = await supabase.storage
@@ -59,7 +54,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to upload image" }, { status: 500 })
     }
 
-    // valid for 1 day
     const { data: signedUrlData, error: signedUrlError } = await supabase.storage
       .from("image")
       .createSignedUrl(fileName, 86400)
@@ -80,7 +74,6 @@ export async function POST(req: NextRequest) {
       url: `${process.env.NEXT_PUBLIC_BASE_URL}/${shortId}`,
       imageUrl: signedUrlData.signedUrl
     })
-
   } catch (error) {
     console.error("Error uploading image:", error)
     return NextResponse.json({ error: "Failed to upload image" }, { status: 500 })

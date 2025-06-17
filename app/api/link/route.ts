@@ -4,8 +4,8 @@ import { createContent } from "@/lib/content-service"
 import { generateShortId } from "@/lib/generate-short-id"
 import { LRUCache } from "lru-cache"
 
-const MAX_URL_LENGTH = 2048
-const RATE_LIMIT = 15 // Max 15 requests per minute
+const MAX_URL_LENGTH = 8192
+const RATE_LIMIT = 15
 
 // Validation schema for link submission
 const linkSchema = z.object({
